@@ -1,10 +1,11 @@
 const http = require('http')
-const mysql = require("mysql");
+const mysql = require('mysql2')
 
 
 const con = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
+    port: 25060,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME
 });
@@ -28,7 +29,7 @@ con.query(
 
 
 const server = http.createServer(function(req, res){
-    res.writeHead('Content-Type', 'application/json');
+    res.writeHead(200, { 'Content-Type': 'application/json' });
     if (req.method === 'POST'){
         let body = "";
         req.on('data', function(chunk){
