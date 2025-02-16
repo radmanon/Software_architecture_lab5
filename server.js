@@ -28,7 +28,7 @@ con.query(
 
 
 const server = http.createServer(function(req, res){
-    res.writeHead('Content-Type', 'application/json');
+    res.writeHead(200, {'Content-Type': 'application/json'});
     if (req.method === 'POST'){
         let body = "";
         req.on('data', function(chunk){
