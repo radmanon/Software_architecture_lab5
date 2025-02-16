@@ -63,8 +63,8 @@ const server = http.createServer(function(req, res){
     }
 });
 
-// Use the PORT environment variable for the correct port
-const PORT = process.env.PORT || 3000;  // Default to 3000 if no PORT is set
+// Use the PORT environment variable for correct port binding
+const PORT = process.env.PORT || 8080;  // Fallback to 8080 if PORT is not set
 server.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
