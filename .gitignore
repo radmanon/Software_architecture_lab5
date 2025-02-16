@@ -1,1 +1,6 @@
 .env
+
+# Ignore the CA certificate in the root directory
+ca-certificate.crt
+
+

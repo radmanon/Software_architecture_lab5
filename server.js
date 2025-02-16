@@ -4,15 +4,13 @@ const fs = require('fs');  // For reading SSL certificates
 
 // Replace these with your actual values
 const con = mysql.createConnection({
-    host: process.env.DB_HOST,          // Example: 'db-mysql-tor..........d.db.ondigitalocean.com'
-    port: process.env.DB_PORT,          // Port: 25060
-    user: process.env.DB_USER,          // Your username
-    password: process.env.DB_PASSWORD,  // Your password
-    database: process.env.DB_NAME,      // Your database name
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     ssl: {
-        ca: fs.readFileSync('path_to_ca_certificate'),   // Path to your CA certificate file
-        key: fs.readFileSync('path_to_client_key'),        // Path to your client key file (if required)
-        cert: fs.readFileSync('path_to_client_cert')       // Path to your client certificate file (if required)
+        ca: fs.readFileSync('./ca-certificate.crt'),  // Path to the certificate in the root directory
     }
 });
 
