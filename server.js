@@ -1,6 +1,7 @@
 const http = require('http')
 const mysql = require('mysql2')
 const fs = require('fs');  // For reading SSL certificates
+require('dotenv').config();
 
 // Replace these with your actual values
 const con = mysql.createConnection({
@@ -9,9 +10,7 @@ const con = mysql.createConnection({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    ssl: {
-        ca: fs.readFileSync('./ca-certificate.crt'),  // Path to the certificate in the root directory
-    }
+    ssl: false
 });
 
 con.connect(function(err){
