@@ -33,12 +33,6 @@ con.query(
 });
 
 const server = http.createServer(function (req, res) {
-    // Set default content-type for all responses
-    
-    res.setHeader("Access-Control-Allow-Origin", "*"); // allow any origin to access API
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS"); // GET and POST and OPTIONS
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    res.writeHead(200, { 'Content-Type': 'application/json' });
     const url = req.url;
 
     if (req.method === 'POST') {
@@ -52,18 +46,19 @@ const server = http.createServer(function (req, res) {
         req.on('end', () => {
             const data = JSON.parse(body);
             if (!data.name || !data.dateOfBirth) {
-                res.writeHead(400);
-                res.end('Error: Missing required fields (name, dateOfBirth)');
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Missing required fields (name, dateOfBirth)' }));
                 return;
             }
             const query = 'INSERT INTO patient (name, dateOfBirth) VALUES (?, ?)';
             con.query(query, [data.name, data.dateOfBirth], (err, result) => {
                 if (err) {
-                    res.writeHead(500);
-                    res.end(`Error inserting data: ${err.message}`);
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: `Error inserting data: ${err.message}` }));
                     return;
                 }
-                res.end(`${data.name} and ${data.dateOfBirth} successfully added to table patient`);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ message: `${data.name} and ${data.dateOfBirth} successfully added to table patient` }));
             });
         });
     } else if (req.method === 'GET') {
@@ -72,27 +67,28 @@ const server = http.createServer(function (req, res) {
 
             // Validate if the SQL query is a SELECT query
             if (!sqlQuery.toLowerCase().startsWith('select')) {
-                res.writeHead(400);
-                res.end("Error: Only SELECT queries are allowed");
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Only SELECT queries are allowed' }));
                 return;  // Return after sending the response to prevent further execution
             }
 
             // Execute the query
             con.query(sqlQuery, (err, result) => {
                 if (err) {
-                    res.writeHead(500);
-                    res.end(`Error fetching data: ${err.message}`);
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: `Error fetching data: ${err.message}` }));
                     return; // Ensure no further response is sent after this
                 }
+                res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify(result));  // Convert the result to JSON and send the response
             });
         } else {
-            res.writeHead(404);
-            res.end("Error: Endpoint not found!");
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Endpoint not found!' }));
         }
     } else {
-        res.writeHead(405);
-        res.end('Method not allowed!');
+        res.writeHead(405, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Method not allowed!' }));
     }
 });
 
