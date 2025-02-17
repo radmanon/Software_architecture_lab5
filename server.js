@@ -38,6 +38,12 @@ const server = http.createServer(function (req, res) {
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS"); // GET and POST and OPTIONS
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
+    if (req.method === 'OPTIONS') {
+        // Respond immediately to OPTIONS requests
+        res.writeHead(204); // No content needed
+        res.end();
+        return;
+    }
     
     const url = req.url;
 
