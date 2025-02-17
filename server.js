@@ -33,7 +33,7 @@ con.query(
 });
 
 const server = http.createServer(function (req, res) {
-    
+
     res.setHeader("Access-Control-Allow-Origin", "*"); // allow any origin to access API
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS"); // GET and POST and OPTIONS
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -69,7 +69,7 @@ const server = http.createServer(function (req, res) {
         });
     } else if (req.method === 'GET') {
         if (url.startsWith('/lab5/api/v1/sql/')) {
-            const sqlQuery = decodeURIComponent(url.slice(18)).trim();  // Extract and trim the SQL query
+            const sqlQuery = decodeURIComponent(url.slice(17)).trim();  // Extract and trim the SQL query
             console.log(`Received SQL query: ${sqlQuery}`);  // Log the query for debugging
 
             // Validate if the SQL query is a SELECT query (case-insensitive)
