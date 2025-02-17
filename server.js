@@ -36,6 +36,9 @@ const server = http.createServer(function (req, res) {
     // Set default content-type for all responses
     res.writeHead(200, { 'Content-Type': 'application/json' });
 
+
+    const url = req.url;
+
     if (req.method === 'POST') {
         let body = "";
         req.on('data', function (chunk) {
@@ -46,30 +49,45 @@ const server = http.createServer(function (req, res) {
 
         req.on('end', () => {
             const data = JSON.parse(body);
-            if (data.type === 'insert') {
-                const query = 'INSERT INTO patient (name, dateOfBirth) VALUES (?, ?)';
-                con.query(query, [data.name, data.dateOfBirth], (err, result) => {
-                    if (err) {
-                        res.writeHead(500);
-                        res.end(`Error inserting data: ${err.message}`);
-                        return;
-                    }
-                    // Send the response after query execution
-                    res.end(`${data.name} and ${data.dateOfBirth} successfully added to table patient`);
-                });
-            }
-        });
-    } else if (req.method === 'GET') {
-        const query = 'SELECT * FROM patient';
-        con.query(query, (err, result) => {
-            if (err) {
-                res.writeHead(500);
-                res.end(`Error fetching data: ${err.message}`);
+            if (!data.name || !data.dateOfBirth) {
+                res.writeHead(400);
+                res.end('Error: Missing required fields (name, dateOfBirth)');
                 return;
             }
-            // Convert the result to JSON and send only once
-            res.end(JSON.stringify(result));  // Convert the result to JSON and send the response
+            const query = 'INSERT INTO patient (name, dateOfBirth) VALUES (?, ?)';
+            con.query(query, [data.name, data.dateOfBirth], (err, result) => {
+                if (err) {
+                    res.writeHead(500);
+                    res.end(`Error inserting data: ${err.message}`);
+                    return;
+                }
+                res.end(`${data.name} and ${data.dateOfBirth} successfully added to table patient`);
+            });
         });
+    } else if (req.method === 'GET') {
+        if (url.startsWith('/lab5/api/v1/sql/')) {
+            const sqlQuery = decodeURIComponent(url.slice(18));  // Extract the SQL query from the URL
+
+            // Validate if the SQL query is a SELECT query
+            if (!sqlQuery.toLowerCase().startsWith('select')) {
+                res.writeHead(400);
+                res.end("Error: Only SELECT queries are allowed");
+                return;  // Return after sending the response to prevent further execution
+            }
+
+            // Execute the query
+            con.query(sqlQuery, (err, result) => {
+                if (err) {
+                    res.writeHead(500);
+                    res.end(`Error fetching data: ${err.message}`);
+                    return; // Ensure no further response is sent after this
+                }
+                res.end(JSON.stringify(result));  // Convert the result to JSON and send the response
+            });
+        } else {
+            res.writeHead(404);
+            res.end("Error: Endpoint not found!");
+        }
     } else {
         res.writeHead(405);
         res.end('Method not allowed!');
@@ -77,7 +95,7 @@ const server = http.createServer(function (req, res) {
 });
 
 // Use the PORT environment variable for correct port binding
-const PORT = process.env.PORT || 8080;  // Fallback to 8080 if PORT is not set
+const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
