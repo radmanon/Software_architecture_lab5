@@ -51,21 +51,27 @@ const server = http.createServer(function (req, res) {
 
         req.on('end', () => {
             const data = JSON.parse(body);
-            if (!data.name || !data.dateOfBirth) {
-                res.writeHead(400, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'Missing required fields (name, dateOfBirth)' }));
-                return;
-            }
-            const query = 'INSERT INTO patient (name, dateOfBirth) VALUES (?, ?)';
-            con.query(query, [data.name, data.dateOfBirth], (err, result) => {
-                if (err) {
-                    res.writeHead(500, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ error: `Error inserting data: ${err.message}` }));
-                    return;
+            if (data.query) {
+                const query = data.query.trim();
+                if (query.toLowerCase().startsWith("insert")) {
+                    // Handle INSERT query
+                    con.query(query, (err, result) => {
+                        if (err) {
+                            res.writeHead(500, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ error: `Error executing INSERT query: ${err.message}` }));
+                            return;
+                        }
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ message: `Data successfully inserted into the patient table.` }));
+                    });
+                } else {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Only INSERT queries are allowed in POST' }));
                 }
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ message: `${data.name} and ${data.dateOfBirth} successfully added to table patient` }));
-            });
+            } else {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'No query provided in the POST request' }));
+            }
         });
     } else if (req.method === 'GET') {
         if (url.startsWith('/lab5/api/v1/sql/')) {
