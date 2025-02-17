@@ -1,9 +1,8 @@
 const http = require('http');
 const mysql = require('mysql2');
-const fs = require('fs');  // For reading SSL certificates
+const fs = require('fs');  // For reading SSL certificates, didnt used but for later
 require('dotenv').config();
 
-// Replace these with your actual values
 const con = mysql.createConnection({
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
@@ -67,9 +66,7 @@ const server = http.createServer(function (req, res) {
 
                 createPatientTable();
 
-
                 if (query.toLowerCase().startsWith("insert")) {
-                    // Handle INSERT query
                     con.query(query, (err, result) => {
                         if (err) {
                             res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -90,29 +87,26 @@ const server = http.createServer(function (req, res) {
         });
     } else if (req.method === 'GET') {
         if (url.startsWith('/lab5/api/v1/sql/')) {
-            const sqlQuery = decodeURIComponent(url.slice(17)).trim();  // Extract and trim the SQL query
-            console.log(`Received SQL query: ${sqlQuery}`);  // Log the query for debugging
+            const sqlQuery = decodeURIComponent(url.slice(17)).trim();
+            console.log(`Received SQL query: ${sqlQuery}`);
 
 
             createPatientTable();
 
-
-            // Validate if the SQL query is a SELECT query (case-insensitive)
             if (!sqlQuery.toLowerCase().startsWith('select')) {
                 res.writeHead(400, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ error: 'Only SELECT queries are allowed' }));
-                return;  // Return after sending the response to prevent further execution
+                return;
             }
 
-            // Execute the query
             con.query(sqlQuery, (err, result) => {
                 if (err) {
                     res.writeHead(500, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ error: `Error fetching data: ${err.message}` }));
-                    return; // Ensure no further response is sent after this
+                    return;
                 }
                 res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify(result));  // Convert the result to JSON and send the response
+                res.end(JSON.stringify(result));
             });
         } else {
             res.writeHead(404, { 'Content-Type': 'application/json' });
@@ -124,8 +118,16 @@ const server = http.createServer(function (req, res) {
     }
 });
 
-// Use the PORT environment variable for correct port binding
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+
+
+//**
+// this code developed by getting assistance from ChatGPT (https://chat.openai.com/).
+// the guide were on setup env file and query detection in GET and POST, it gave us idea how to detect the
+// specific query type and handle it in each POST and GET. it also helped for setup the MySQL database in digitalOcean. 
+// and the last thing it helped was the case that database doesnt exist and it gave us idea to use function and recall it.
+//  */
