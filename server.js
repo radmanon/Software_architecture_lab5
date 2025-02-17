@@ -35,7 +35,9 @@ con.query(
 const server = http.createServer(function (req, res) {
     // Set default content-type for all responses
     res.writeHead(200, { 'Content-Type': 'application/json' });
-
+    res.setHeader("Access-Control-Allow-Origin", "*"); // allow any origin to access API
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS"); // GET and POST and OPTIONS
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
     const url = req.url;
 
