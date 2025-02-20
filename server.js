@@ -69,7 +69,7 @@ const server = http.createServer(function (req, res) {
                 if (query.toLowerCase().startsWith("insert")) {
                     con.query(query, (err, result) => {
                         if (err) {
-                            res.writeHead(500, { 'Content-Type': 'application/json' });
+                            res.writeHead(400, { 'Content-Type': 'application/json' });
                             res.end(JSON.stringify({ error: `Error executing INSERT query: ${err.message}` }));
                             return;
                         }
@@ -101,7 +101,7 @@ const server = http.createServer(function (req, res) {
 
             con.query(sqlQuery, (err, result) => {
                 if (err) {
-                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ error: `Error fetching data: ${err.message}` }));
                     return;
                 }
